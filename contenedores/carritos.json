@@ -1,0 +1,67 @@
+[
+  {
+    "items": [
+      {
+        "id": 1,
+        "title": "Trek",
+        "price": "9000",
+        "thumbnail": "../../uploads/1668948120923_madonesl7.png"
+      },
+      {
+        "id": 2,
+        "title": "S-Works",
+        "price": 10000,
+        "thumbnail": "../../uploads/1668979292322_sworks-tarmac.png"
+      },
+      {
+        "id": 3,
+        "title": "Canyon",
+        "price": 12000,
+        "thumbnail": "../../uploads/1668980352730_trinity.png"
+      },
+      {
+        "title": "Cube",
+        "price": 1000,
+        "thumbnail": "../../uploads/1668980352730_trinity.png",
+        "id": 4
+      },
+      {
+        "id": 5,
+        "title": "TREK",
+        "price": 11000,
+        "thumbnail": "1668979292322_sworks-tarmac.png"
+      }
+    ],
+    "cart_timestamp": 1670515029237,
+    "id": 1
+  },
+  {
+    "items": [
+      {
+        "id": 1,
+        "title": "Trek",
+        "price": "9000",
+        "thumbnail": "../../uploads/1668948120923_madonesl7.png"
+      },
+      {
+        "id": 2,
+        "title": "S-Works",
+        "price": 10000,
+        "thumbnail": "../../uploads/1668979292322_sworks-tarmac.png"
+      },
+      {
+        "id": 3,
+        "title": "Canyon",
+        "price": 12000,
+        "thumbnail": "../../uploads/1668980352730_trinity.png"
+      }
+    ],
+    "cart_timestamp": 1670514747713,
+    "id": 2
+  },
+  {
+    "items": [],
+    "cart_timestamp": 1670508563171,
+    "id": 3
+  }
+]
