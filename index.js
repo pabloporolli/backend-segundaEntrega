@@ -1,11 +1,21 @@
-const express = require ('express')
+import express from 'express'
 const {Router} = express
-const handlebars = require('express-handlebars')
-const upload = require('./multer.js')
+import handlebars from 'express-handlebars'
+import upload from './multer.js'
+
+import {
+    productosDao as productosApi,
+    carritosDao as carritosApi
+} from './daos/index.js'
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const router = new Router()
 
-const Contenedor = require('./contenedores/claseContenedor.js')
+import Contenedor from './DB/contenedores/claseContenedor.js'
 
 const app = express()
 
@@ -15,11 +25,6 @@ const server = app.listen(PORT, () => {
 })
 
 server.on ("error", error => console.log(`Error de conexión: ${error}`))
-
-const productos = new Contenedor ('./contenedores/productosNuevo.json')
-
-// Instancio clase carrito
-const carritos = new Contenedor ('./contenedores/carritos.json')
 
 app.use('/api', router)
 // app.use(express.static('public'))
@@ -71,32 +76,24 @@ const soloAdmins = (req, res, next) =>{
 
 // GET '/api/productos'
 router.get('/productos', async (req, res) => {
-    const respuesta =  await productos.getAll()
+    const respuesta =  await productosApi.getAll()
     res.render('main', {respuesta})
 })
 
 // GET producto by id por parámetro
 router.get('/productos/:id', async (req, res) => {
-    const respuesta = await productos.getById(parseInt(req.params.id))
+    const respuesta = await productosApi.getById(parseInt(req.params.id))
     res.send(!respuesta ? {error: "producto no encontrado"} : respuesta)
     })
 
 // POST. Agrega un producto y devuelve su id
-router.post('/productos', soloAdmins, upload.single('picture'), async (req, res) => {
+router.post('/productos', soloAdmins, async (req, res) => {
     const prod = await req.body
     console.log("prod: ", prod)
-    const file = req.file
-    const nombreArchivo = req.file.filename
     const producto = {
         ...prod,
-        thumbnail: nombreArchivo
     }
-    if (!file) {
-        const error = new Error ('Por favor, suba un archivo')
-        error.httpStatusCode = 400
-        return next (error)
-    }
-    productos.save(producto)
+    productosApi.save(producto)
     .then( respuesta => {
     res.render('formulario', {respuesta, registrado: true})
     })
@@ -107,13 +104,13 @@ router.put('/productos/:id', soloAdmins, (req, res) => {
     const cambio = req.body
     console.log("cambio: ", cambio)
     const pos = parseInt(req.params.id)
-    productos.modifyById(pos, cambio)
+    productosApi.modifyById(pos, cambio)
 })
 
 // DELETE. Elimina según id
 router.delete('/productos/:id', soloAdmins, (req, res) => {
     const pos = parseInt(req.params.id)
-    productos.deleteById(pos)
+    productosApi.deleteById(pos)
     res.send({"Producto eliminado. ID": pos})
 })
 
@@ -129,49 +126,57 @@ app.get('/', (req, res, next) => {
 // POST. Crea un carrito y asigna un id
 router.post('/carrito', async (req, res) => {
     let timestamp = Date.now()
+    let productos = await req.body
     let nuevoCarrito = {
-        items: [],
+        items: productos,
         cart_timestamp: timestamp
-    } 
-    carritos.save(nuevoCarrito)
+    }
+    carritosApi.save(nuevoCarrito)
     .then(id => res.send(`Carrito creado con el id ${id}`))
 })
+// Para probarlo, se manda un array de objetos (cada objeto un producto).
 
 // DELETE ID. Elimina un carrito
 router.delete('/carrito/:id', (req, res) => {
     const pos = parseInt(req.params.id)
-    carritos.deleteById(pos)
+    carritosApi.deleteById(pos)
     res.send({"Carrito eliminado. ID": pos})
 })
 
 // GET. Listar todos los productos de un carrito
 router.get('/carrito/:id', async (req, res) => {
-    const respuesta = await carritos.getById(parseInt(req.params.id))
+    const respuesta = await carritosApi.getById(parseInt(req.params.id))
     res.send(!respuesta ? {error: "carrito no encontrado"} : respuesta)
     })
+
+// GET ALL
+router.get('/carrito', async (req, res) => {
+    const resp = await carritosApi.getAll()
+    res.send(resp)
+})
 
 // POST. Incorporar productos al carrito por su id
 router.post('/carrito/:id', (req, res) => {
     const idCarrito = parseInt(req.params.id)
     const prod = req.body
-    carritos.getById(idCarrito)
-    .then(res => {
+    carritosApi.getById(idCarrito)
+    .then(r => {
         let timestamp = Date.now()
         const nuevoCarro = {
             items: prod,
-            cart_timestamp: timestamp,
-            id: idCarrito
+            // cart_timestamp: timestamp,
+            // id: idCarrito
         }
-        carritos.modifyCarritoById(idCarrito, nuevoCarro)
+        carritosApi.modifyCarritoById(idCarrito, nuevoCarro)
+        res.send("Producto incorporado al carrito")
     })
-    res.send("Producto incorporado al carrito")
 })
 
 // DELETE. Elimina un producto del carrito por id de producto y id de carrito
 router.delete('/carrito/:id/productos/:id_prod', (req, res) => {
     let id = parseInt(req.params.id)
     let id_prod = parseInt(req.params.id_prod)
-    carritos.getById(id)
+    carritosApi.getById(id)
     .then((carrito)=>{
         console.log("ITEMS: ", carrito[0].items)
         let productos = carrito[0].items
@@ -182,7 +187,7 @@ router.delete('/carrito/:id/productos/:id_prod', (req, res) => {
         }
         productos.splice(index, 1)
         let cart_timestamp = Date.now()
-        carritos.modifyCarritoById(id, {"items": productos, cart_timestamp, "id": id})
+        carritosApi.modifyCarritoById(id, {"items": productos, cart_timestamp, "id": id})
         res.send("Producto eliminado")
     })
 })

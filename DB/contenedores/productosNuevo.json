@@ -28,5 +28,11 @@
     "title": "TREK",
     "price": 11000,
     "thumbnail": "1668979292322_sworks-tarmac.png"
+  },
+  {
+    "title": "Nueva Bici",
+    "price": 8000,
+    "thumbnail": "https://www.tradeinn.com/f/13828/138282802_3/specialized-bicicleta-carretera-tarmac-sl7-pro-force-etap-axs-2022.jpg",
+    "id": 6
   }
 ]

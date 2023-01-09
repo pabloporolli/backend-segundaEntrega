@@ -1,5 +1,5 @@
 // Configuración de Multer para almacenamiento de archivos en disco
-const multer = require('multer')
+import multer from 'multer'
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -12,4 +12,4 @@ const storage = multer.diskStorage({
 
 const upload = multer({storage})
 
-module.exports = upload
+export default upload

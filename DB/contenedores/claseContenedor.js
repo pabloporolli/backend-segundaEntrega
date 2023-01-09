@@ -1,8 +1,9 @@
-const fs = require ('fs').promises
+import { promises as fs } from 'fs'
+import config from '../../config.js'
 
 class Contenedor {
-    constructor (path) {
-        this.fileName = path;
+    constructor (ruta) {
+        this.fileName = `${config.fileSystem.path}/${ruta}`;
     }
 
     async save (producto) {
@@ -56,6 +57,7 @@ class Contenedor {
         try {
             let dataSinJSON = await fs.readFile(this.fileName, 'utf-8');
             const data = JSON.parse(dataSinJSON);
+            console.log("DATA ID: ", data.id);
             const prodAConservar = data.filter(prod => prod.id !== num);
             await fs.writeFile(this.fileName, JSON.stringify(prodAConservar, null, 2),'utf-8');
             console.log("El producto fue eliminado correctamente.");
@@ -122,14 +124,6 @@ class Contenedor {
 
 const productos = new Contenedor ('./productos.json');
 
-
-module.exports = Contenedor;
-
-// Métodos a probar
-// productos.save(scott);
-// productos.getById(8);
-// productos.getAll();
-// productos.deleteById(8);
-// productos.deleteAll();
+export default Contenedor;
 
 
